@@ -60,6 +60,24 @@ const chao = {
   }
 }
 
+const mensagemGetReady = {
+  sourceX: 134,
+  sourceY: 0,
+  largura: 174,
+  altura: 152,
+  destinationX: 0,
+  destinationY: 58,
+  desenha() {
+    contexto.drawImage(
+      sprites,
+      mensagemGetReady.sourceX, mensagemGetReady.sourceY, //sourceX, sourceY (Canto superior esquerdo do início da imagem)
+      mensagemGetReady.largura, mensagemGetReady.altura, //sourceWidth, sourceHeight (altura e largura da imagem)
+      ((canvas.width / 2) - (this.largura / 2)), mensagemGetReady.destinationY, //destinationX, destinationY (Canto superior esquedo para início da imagem dentro do canvas)
+      mensagemGetReady.largura, mensagemGetReady.altura //destinationWidth, destinationHeight (altura e largura da imagem dentro do canvas)
+    );
+  }
+}
+
 const flappyBird = {
   sourceX: 0,
   sourceY: 0,
@@ -71,7 +89,6 @@ const flappyBird = {
   velocidade: 0,
   atualiza() {
     flappyBird.velocidade += this.gravidade;
-    console.log(this.velocidade);
     flappyBird.destinationY += this.velocidade;
   },
   desenha() {
@@ -85,13 +102,54 @@ const flappyBird = {
   }
 };
 
+let telaAtiva = {};
+
+function mudarTela(novaTela) {
+  telaAtiva = novaTela;
+}
+
+const telas = {
+  inicio: {
+    desenha() {
+      planoFundo.desenha();
+      chao.desenha();
+      mensagemGetReady.desenha();
+      flappyBird.desenha();
+    },
+    atualiza() {
+
+    },
+    click() {
+      mudarTela(telas.jogo);
+    }
+  },
+
+  jogo: {
+    desenha() {
+      planoFundo.desenha();
+      chao.desenha();
+      flappyBird.desenha();
+    },
+    atualiza() {
+      flappyBird.atualiza();
+    }
+  }
+};
+
 function loop() {
-  flappyBird.atualiza();
-  planoFundo.desenha();
-  chao.desenha();
-  flappyBird.desenha();
+
+  telaAtiva.desenha();
+  telaAtiva.atualiza();
+ 
   requestAnimationFrame(loop);
 }
 
+window.addEventListener('click', function() {
+  if(telaAtiva.click) {
+    telaAtiva.click();
+  }
+});
+
+mudarTela(telas.inicio);
 loop();
 
